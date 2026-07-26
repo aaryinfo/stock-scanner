@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.rar
+.env
+.DS_Store
+*.log
