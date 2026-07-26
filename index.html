@@ -3,19 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NASDAQ 100 Live Portal & Trading Signals | US Tech 100 Cash IG</title>
-  <meta name="description" content="Real-time NASDAQ-100 Index portal, live TradingView charts, multi-timeframe technical indicator signals, and constituent stock screener.">
+  <title>NSE F&O Intraday Scanner & NASDAQ Live Portal | Trading Signals & AI Agent</title>
+  <meta name="description" content="Real-time stock scanner for NSE F&O & NASDAQ-100 index with TradingView charts, AI Trading Agent, signals, and paper trading journal.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+  <!-- Disclaimer Banner -->
+  <div class="disclaimer-banner" style="background: rgba(255, 171, 0, 0.08); border-bottom: 1px solid rgba(255, 171, 0, 0.2); padding: 4px 16px; font-size: 11px; color: #ffab00; text-align: center; font-weight: 600;">
+    <span>⚠ For Educational Purpose Only. Real-Time Trading Signals & AI Agent Analytics.</span>
+  </div>
 
   <!-- Header / Navigation Bar -->
   <header class="portal-header">
     <div class="brand-container">
       <div class="brand-logo">NDX</div>
       <div>
-        <div class="brand-title">NASDAQ 100 LIVE PORTAL</div>
-        <div class="brand-subtitle">Real-time Technical Signals & Index Screener</div>
+        <div class="brand-title">NASDAQ & NSE LIVE SIGNAL PORTAL</div>
+        <div class="brand-subtitle">Real-time Technical Signals, F&O Screener & AI Agent</div>
       </div>
     </div>
     <div style="display: flex; align-items: center; gap: 16px;">
@@ -24,366 +33,516 @@
         <span id="market-status-text">MARKET LIVE (24/7 FEED)</span>
       </div>
       <div style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-sub);" id="live-clock">
-        --:--:-- UTC
+        --:--:-- IST
       </div>
     </div>
   </header>
 
+  <!-- Top Navigation & Tab Controls -->
+  <nav style="background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 8px 20px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+    <div class="filter-tabs" id="mainTabNav" style="display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 8px;">
+      <button class="ftab active" id="tab-btn-portal" onclick="switchMainTab('portal')">📈 NASDAQ PORTAL</button>
+      <button class="ftab" id="tab-btn-scanner" onclick="switchMainTab('scanner')">📊 F&O SCANNER</button>
+      <button class="ftab" id="tab-btn-agent" onclick="switchMainTab('agent')" style="color:#a855f7;">🤖 AI AGENT</button>
+      <button class="ftab" id="tab-btn-chart" onclick="switchMainTab('chart')">📊 CHART ANALYZER</button>
+      <button class="ftab" id="tab-btn-journal" onclick="switchMainTab('journal')">📖 TRADING JOURNAL</button>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button class="ftab buy-tab" onclick="filterSignals('BUY')">▲ BUY SIGNALS</button>
+      <button class="ftab sell-tab" onclick="filterSignals('SELL')">▼ SELL SIGNALS</button>
+    </div>
+  </nav>
+
   <div class="portal-container">
 
-    <!-- Index Overview Ribbon -->
-    <section class="index-cards-grid">
-      <div class="index-card">
-        <div class="index-card-header">
-          <span class="index-card-title">US Tech 100 Cash · IG</span>
-          <span class="index-card-ticker">IG:NASDAQ</span>
+    <!-- TAB 1: NASDAQ PORTAL SECTION -->
+    <div id="section-portal" class="main-tab-section" style="display: block;">
+      <!-- Index Overview Ribbon -->
+      <section class="index-cards-grid">
+        <div class="index-card">
+          <div class="index-card-header">
+            <span class="index-card-title">US Tech 100 Cash · IG</span>
+            <span class="index-card-ticker">IG:NASDAQ</span>
+          </div>
+          <div class="index-card-price" id="card-ig-price">28,972.8</div>
+          <div class="index-card-change chg-positive" id="card-ig-chg">▲ +0.0 (+0.00%)</div>
         </div>
-        <div class="index-card-price" id="card-ig-price">28,972.8</div>
-        <div class="index-card-change chg-positive" id="card-ig-chg">▲ +0.0 (+0.00%)</div>
-      </div>
-      <div class="index-card">
-        <div class="index-card-header">
-          <span class="index-card-title">NASDAQ-100 Index</span>
-          <span class="index-card-ticker">NASDAQ:NDX</span>
+        <div class="index-card">
+          <div class="index-card-header">
+            <span class="index-card-title">NASDAQ-100 Index</span>
+            <span class="index-card-ticker">NASDAQ:NDX</span>
+          </div>
+          <div class="index-card-price" id="card-ndx-price">29,155.18</div>
+          <div class="index-card-change chg-positive" id="card-ndx-chg">▲ +550.8 (+1.93%)</div>
         </div>
-        <div class="index-card-price" id="card-ndx-price">29,155.18</div>
-        <div class="index-card-change chg-positive" id="card-ndx-chg">▲ +550.8 (+1.93%)</div>
-      </div>
-      <div class="index-card">
-        <div class="index-card-header">
-          <span class="index-card-title">NASDAQ Composite</span>
-          <span class="index-card-ticker">NASDAQ:IXIC</span>
+        <div class="index-card">
+          <div class="index-card-header">
+            <span class="index-card-title">NASDAQ Composite</span>
+            <span class="index-card-ticker">NASDAQ:IXIC</span>
+          </div>
+          <div class="index-card-price" id="card-ixic-price">25,837.21</div>
+          <div class="index-card-change chg-positive" id="card-ixic-chg">▲ +328.9 (+1.29%)</div>
         </div>
-        <div class="index-card-price" id="card-ixic-price">25,837.21</div>
-        <div class="index-card-change chg-positive" id="card-ixic-chg">▲ +328.9 (+1.29%)</div>
-      </div>
-      <div class="index-card">
-        <div class="index-card-header">
-          <span class="index-card-title">Invesco QQQ Trust</span>
-          <span class="index-card-ticker">NASDAQ:QQQ</span>
+        <div class="index-card">
+          <div class="index-card-header">
+            <span class="index-card-title">Invesco QQQ Trust</span>
+            <span class="index-card-ticker">NASDAQ:QQQ</span>
+          </div>
+          <div class="index-card-price" id="card-qqq-price">708.97</div>
+          <div class="index-card-change chg-positive" id="card-qqq-chg">▲ +12.9 (+1.85%)</div>
         </div>
-        <div class="index-card-price" id="card-qqq-price">708.97</div>
-        <div class="index-card-change chg-positive" id="card-qqq-chg">▲ +12.9 (+1.85%)</div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Main Section: Live TradingView Chart & HUD Overlay Card -->
-    <section class="main-chart-section">
-      <!-- Interactive Technical Chart Container -->
-      <div class="chart-container-card" id="main-chart-card">
-        <div class="chart-header">
-          <div class="symbol-info">
-            <select id="symbol-select" class="symbol-dropdown" onchange="changeSymbol(this.value, this.options[this.selectedIndex].text)">
-              <option value="IG:NASDAQ" selected>US Tech 100 Cash · IG (IG:NASDAQ)</option>
-              <option value="TVC:US100">US Tech 100 Cash (TVC:US100)</option>
-              <option value="CAPITALCOM:US100">Capital.com US100 (CAPITALCOM:US100)</option>
-              <option value="NASDAQ:NDX">NASDAQ-100 Index (NASDAQ:NDX)</option>
-              <option value="CME:NQ1!">E-mini NASDAQ Futures (CME:NQ1!)</option>
-              <option value="NASDAQ:QQQ">Invesco QQQ (NASDAQ:QQQ)</option>
-            </select>
+      <!-- Main Section: Live TradingView Chart & HUD Overlay Card -->
+      <section class="main-chart-section">
+        <!-- Interactive Technical Chart Container -->
+        <div class="chart-container-card" id="main-chart-card">
+          <div class="chart-header">
+            <div class="symbol-info">
+              <select id="symbol-select" class="symbol-dropdown" onchange="changeSymbol(this.value, this.options[this.selectedIndex].text)">
+                <option value="IG:NASDAQ" selected>US Tech 100 Cash · IG (IG:NASDAQ)</option>
+                <option value="TVC:US100">US Tech 100 Cash (TVC:US100)</option>
+                <option value="CAPITALCOM:US100">Capital.com US100 (CAPITALCOM:US100)</option>
+                <option value="NASDAQ:NDX">NASDAQ-100 Index (NASDAQ:NDX)</option>
+                <option value="CME:NQ1!">E-mini NASDAQ Futures (CME:NQ1!)</option>
+                <option value="NASDAQ:QQQ">Invesco QQQ (NASDAQ:QQQ)</option>
+              </select>
 
-            <!-- NSE 500 Stock Search Combo -->
-            <div class="stock-search-combo">
-              <input
-                type="text"
-                id="stock-search-input"
-                list="nse500-datalist"
-                class="symbol-dropdown stock-search-input"
-                placeholder="🔍 Search NSE stock (e.g. Reliance, TCS, HDFC Bank)..."
-                autocomplete="off"
-                oninput="handleStockSearchInput(this.value)"
-              >
-              <datalist id="nse500-datalist"></datalist>
+              <!-- NSE 500 Stock Search Combo -->
+              <div class="stock-search-combo">
+                <input
+                  type="text"
+                  id="stock-search-input"
+                  list="nse500-datalist"
+                  class="symbol-dropdown stock-search-input"
+                  placeholder="🔍 Search NSE stock (e.g. Reliance, TCS, HDFC Bank)..."
+                  autocomplete="off"
+                  oninput="handleStockSearchInput(this.value)"
+                >
+                <datalist id="nse500-datalist"></datalist>
+              </div>
+
+              <span class="active-symbol-badge">Now viewing: <span id="active-chart-symbol-text">US Tech 100 Cash · IG (IG:NASDAQ)</span></span>
+
+              <!-- Chart Engine Mode Switcher -->
+              <div style="display: flex; gap: 4px; background: rgba(0,0,0,0.5); padding: 3px; border-radius: 8px; border: 1px solid var(--border-glass); margin-left: 12px;">
+                <button class="engine-btn" id="btn-engine-tv" onclick="switchChartEngine('tv_widget')">TradingView Live Widget</button>
+                <button class="engine-btn active" id="btn-engine-custom" onclick="switchChartEngine('custom_hud')">RSI Divergence HUD Engine</button>
+              </div>
+
+              <!-- Layer De-Clutter Toggles Bar -->
+              <div class="layer-toggle-bar" style="margin-left: 12px;">
+                <label class="layer-toggle"><input type="checkbox" id="toggle-vp" checked onclick="toggleChartLayer('vp')"> Profile</label>
+                <label class="layer-toggle"><input type="checkbox" id="toggle-vwap" checked onclick="toggleChartLayer('vwap')"> VWAP</label>
+                <label class="layer-toggle"><input type="checkbox" id="toggle-div" checked onclick="toggleChartLayer('div')"> Divergences</label>
+                <label class="layer-toggle"><input type="checkbox" id="toggle-ob" checked onclick="toggleChartLayer('ob')"> Zones</label>
+                <label class="layer-toggle"><input type="checkbox" id="toggle-subpane" checked onclick="toggleChartLayer('subpane')"> Volume Grid</label>
+              </div>
             </div>
 
-            <span class="active-symbol-badge">Now viewing: <span id="active-chart-symbol-text">US Tech 100 Cash · IG (IG:NASDAQ)</span></span>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <div class="tf-selector-group">
+                <button class="tf-btn" onclick="changeTimeframe('1')">1m</button>
+                <button class="tf-btn" onclick="changeTimeframe('5')">5m</button>
+                <button class="tf-btn active" onclick="changeTimeframe('15')">15m</button>
+                <button class="tf-btn" onclick="changeTimeframe('60')">1h</button>
+                <button class="tf-btn" onclick="changeTimeframe('240')">4h</button>
+                <button class="tf-btn" onclick="changeTimeframe('D')">1D</button>
+              </div>
 
-            <!-- Chart Engine Mode Switcher -->
-            <div style="display: flex; gap: 4px; background: rgba(0,0,0,0.5); padding: 3px; border-radius: 8px; border: 1px solid var(--border-glass); margin-left: 12px;">
-              <button class="engine-btn" id="btn-engine-tv" onclick="switchChartEngine('tv_widget')">TradingView Live Widget</button>
-              <button class="engine-btn active" id="btn-engine-custom" onclick="switchChartEngine('custom_hud')">RSI Divergence HUD Engine</button>
-            </div>
+              <!-- Interactive 2D Navigation & Zoom Controls -->
+              <div style="display: flex; gap: 4px; background: rgba(0,0,0,0.5); padding: 3px; border-radius: 8px; border: 1px solid var(--border-glass);">
+                <button class="zoom-btn" onclick="panChart(5, 0)" title="Pan Left">◀</button>
+                <button class="zoom-btn" onclick="panChart(-5, 0)" title="Pan Right">▶</button>
+                <button class="zoom-btn" onclick="panChart(0, -20)" title="Pan Up">▲</button>
+                <button class="zoom-btn" onclick="panChart(0, 20)" title="Pan Down">▼</button>
+                <button class="zoom-btn" onclick="zoomChart(-10)" title="Zoom In (Mouse Wheel Up)">🔍 +</button>
+                <button class="zoom-btn" onclick="zoomChart(10)" title="Zoom Out (Mouse Wheel Down)">🔍 -</button>
+                <button class="zoom-btn" onclick="verticalZoomChart(1.25)" title="Expand chart vertically (stretch price axis)">↕ +</button>
+                <button class="zoom-btn" onclick="verticalZoomChart(0.8)" title="Compress chart vertically (shrink price axis)">↕ -</button>
+                <button class="zoom-btn" onclick="resetChartZoom()" title="Reset Auto-Fit View (Double Click)">↺ Reset</button>
+              </div>
 
-            <!-- Layer De-Clutter Toggles Bar -->
-            <div class="layer-toggle-bar" style="margin-left: 12px;">
-              <label class="layer-toggle"><input type="checkbox" id="toggle-vp" checked onclick="toggleChartLayer('vp')"> Profile</label>
-              <label class="layer-toggle"><input type="checkbox" id="toggle-vwap" checked onclick="toggleChartLayer('vwap')"> VWAP</label>
-              <label class="layer-toggle"><input type="checkbox" id="toggle-div" checked onclick="toggleChartLayer('div')"> Divergences</label>
-              <label class="layer-toggle"><input type="checkbox" id="toggle-ob" checked onclick="toggleChartLayer('ob')"> Zones</label>
-              <label class="layer-toggle"><input type="checkbox" id="toggle-subpane" checked onclick="toggleChartLayer('subpane')"> Volume Grid</label>
-            </div>
-          </div>
-
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <div class="tf-selector-group">
-              <button class="tf-btn" onclick="changeTimeframe('1')">1m</button>
-              <button class="tf-btn" onclick="changeTimeframe('5')">5m</button>
-              <button class="tf-btn active" onclick="changeTimeframe('15')">15m</button>
-              <button class="tf-btn" onclick="changeTimeframe('60')">1h</button>
-              <button class="tf-btn" onclick="changeTimeframe('240')">4h</button>
-              <button class="tf-btn" onclick="changeTimeframe('D')">1D</button>
-            </div>
-
-            <!-- Interactive 2D Navigation & Zoom Controls -->
-            <div style="display: flex; gap: 4px; background: rgba(0,0,0,0.5); padding: 3px; border-radius: 8px; border: 1px solid var(--border-glass);">
-              <button class="zoom-btn" onclick="panChart(5, 0)" title="Pan Left">◀</button>
-              <button class="zoom-btn" onclick="panChart(-5, 0)" title="Pan Right">▶</button>
-              <button class="zoom-btn" onclick="panChart(0, -20)" title="Pan Up">▲</button>
-              <button class="zoom-btn" onclick="panChart(0, 20)" title="Pan Down">▼</button>
-              <button class="zoom-btn" onclick="zoomChart(-10)" title="Zoom In (Mouse Wheel Up)">🔍 +</button>
-              <button class="zoom-btn" onclick="zoomChart(10)" title="Zoom Out (Mouse Wheel Down)">🔍 -</button>
-              <button class="zoom-btn" onclick="verticalZoomChart(1.25)" title="Expand chart vertically (stretch price axis)">↕ +</button>
-              <button class="zoom-btn" onclick="verticalZoomChart(0.8)" title="Compress chart vertically (shrink price axis)">↕ -</button>
-              <button class="zoom-btn" onclick="resetChartZoom()" title="Reset Auto-Fit View (Double Click)">↺ Reset</button>
-            </div>
-
-            <button class="fullscreen-btn" id="btn-fullscreen" onclick="toggleChartFullscreen()">⛶ Fullscreen</button>
-          </div>
-        </div>
-
-        <!-- Chart Type / Drawing Tools / Snapshot Toolbar -->
-        <div class="drawing-toolbar-row">
-          <div class="toolbar-group">
-            <span class="toolbar-group-label">Chart:</span>
-            <button class="chart-type-btn active" id="chart-type-candles" onclick="setChartType('candles')" title="Candlestick chart">🕯 Candles</button>
-            <button class="chart-type-btn" id="chart-type-line" onclick="setChartType('line')" title="Line chart">📈 Line</button>
-            <button class="chart-type-btn" id="chart-type-area" onclick="setChartType('area')" title="Area chart">🏔 Area</button>
-          </div>
-          <div class="toolbar-group">
-            <span class="toolbar-group-label">Draw:</span>
-            <button class="draw-tool-btn active" id="draw-tool-cursor" onclick="setDrawingTool(null)" title="Cursor (pan / zoom)">↖ Cursor</button>
-            <button class="draw-tool-btn" id="draw-tool-trendline" onclick="setDrawingTool('trendline')" title="Trend line — click two points">╱ Trend Line</button>
-            <button class="draw-tool-btn" id="draw-tool-hline" onclick="setDrawingTool('hline')" title="Horizontal line — click one point">─ H-Line</button>
-            <button class="draw-tool-btn" id="draw-tool-rect" onclick="setDrawingTool('rect')" title="Rectangle zone — click two corners">▭ Rectangle</button>
-            <button class="draw-tool-btn" onclick="clearAllDrawings()" title="Clear all drawings on this symbol/timeframe">🗑 Clear</button>
-          </div>
-          <div class="toolbar-group">
-            <button class="draw-tool-btn" onclick="saveChartSnapshot()" title="Download chart as PNG">📷 Snapshot</button>
-          </div>
-        </div>
-
-        <div id="drawing-mode-banner" style="display: none; background: rgba(251, 191, 36, 0.15); border: 1px solid #fbbf24; color: #fbbf24; font-size: 0.78rem; font-weight: 600; padding: 6px 12px; border-radius: 6px; margin-bottom: 10px;"></div>
-
-        <!-- TradingView Embedded Container -->
-        <div id="tradingview_chart_container" style="width: 100%; height: 580px; border-radius: 10px; overflow: hidden; background: #070a10; position: relative;"></div>
-      </div>
-
-      <!-- TradingView Signal Box (Right Side Window) -->
-      <div class="tv-hud-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <div class="hud-title" style="margin-bottom: 0;">TradingView Signal Box</div>
-          <button class="btn-scan-trade" onclick="triggerNewTradeScan()" title="Force scan live candles for a new trade setup">⚡ Scan New Trade</button>
-        </div>
-
-        <div class="hud-box">
-          <div class="hud-row">
-            <div class="hud-label">Signal</div>
-            <div class="hud-val">
-              <span class="badge-buy" id="hud-signal">BUY</span>
+              <button class="fullscreen-btn" id="btn-fullscreen" onclick="toggleChartFullscreen()">⛶ Fullscreen</button>
             </div>
           </div>
 
-          <div class="hud-row">
-            <div class="hud-label">Live Price</div>
-            <div class="hud-val" id="hud-price">28972.8</div>
-          </div>
-
-          <div class="hud-row" style="background: rgba(59, 130, 246, 0.08);">
-            <div class="hud-label" style="color: #60a5fa; font-weight: 700;">Trade Timing</div>
-            <div class="hud-val" style="color: #60a5fa; font-weight: 700;" id="hud-trade-time">18:45:00 UTC</div>
-          </div>
-
-          <div class="hud-row" style="background: rgba(16, 185, 129, 0.08);">
-            <div class="hud-label" style="color: #34d399; font-weight: 700;">Entry</div>
-            <div class="hud-val" style="color: #34d399; font-weight: 700;" id="hud-entry">28854.1</div>
-          </div>
-
-          <div class="hud-row" style="background: rgba(239, 68, 68, 0.08);">
-            <div class="hud-label" style="color: #f87171; font-weight: 700;">SL</div>
-            <div class="hud-val" style="color: #f87171; font-weight: 700;" id="hud-sl">28786.9</div>
-          </div>
-
-          <div class="hud-row" style="background: rgba(16, 185, 129, 0.08);">
-            <div class="hud-label" style="color: #4ade80; font-weight: 700;">Target 1</div>
-            <div class="hud-val" style="color: #4ade80; font-weight: 700;" id="hud-tp1">28955.0</div>
-          </div>
-
-          <div class="hud-row" style="background: rgba(16, 185, 129, 0.12);">
-            <div class="hud-label" style="color: #10b981; font-weight: 700;">Target 2</div>
-            <div class="hud-val" style="color: #10b981; font-weight: 700;" id="hud-tp2">29022.0</div>
-          </div>
-
-          <div class="hud-row">
-            <div class="hud-label">R : R</div>
-            <div class="hud-val" style="color: #fbbf24; font-weight: 700;" id="hud-rr">1 : 2</div>
-          </div>
-
-          <div class="hud-row">
-            <div class="hud-label">Bars Ago</div>
-            <div class="hud-val" id="hud-bars-ago">0</div>
-          </div>
-
-          <div class="hud-row">
-            <div class="hud-label">Why</div>
-            <div class="hud-val">
-              <span class="hud-why-tag" id="hud-why">Support Zone (VAL) + RSI Bull Div + Volume Bull Div</span>
+          <!-- Chart Type / Drawing Tools / Snapshot Toolbar -->
+          <div class="drawing-toolbar-row">
+            <div class="toolbar-group">
+              <span class="toolbar-group-label">Chart:</span>
+              <button class="chart-type-btn active" id="chart-type-candles" onclick="setChartType('candles')" title="Candlestick chart">🕯 Candles</button>
+              <button class="chart-type-btn" id="chart-type-line" onclick="setChartType('line')" title="Line chart">📈 Line</button>
+              <button class="chart-type-btn" id="chart-type-area" onclick="setChartType('area')" title="Area chart">🏔 Area</button>
+            </div>
+            <div class="toolbar-group">
+              <span class="toolbar-group-label">Draw:</span>
+              <button class="draw-tool-btn active" id="draw-tool-cursor" onclick="setDrawingTool(null)" title="Cursor (pan / zoom)">↖ Cursor</button>
+              <button class="draw-tool-btn" id="draw-tool-trendline" onclick="setDrawingTool('trendline')" title="Trend line — click two points">╱ Trend Line</button>
+              <button class="draw-tool-btn" id="draw-tool-hline" onclick="setDrawingTool('hline')" title="Horizontal line — click one point">─ H-Line</button>
+              <button class="draw-tool-btn" id="draw-tool-rect" onclick="setDrawingTool('rect')" title="Rectangle zone — click two corners">▭ Rectangle</button>
+              <button class="draw-tool-btn" onclick="clearAllDrawings()" title="Clear all drawings on this symbol/timeframe">🗑 Clear</button>
+            </div>
+            <div class="toolbar-group">
+              <button class="draw-tool-btn" onclick="saveChartSnapshot()" title="Download chart as PNG">📷 Snapshot</button>
             </div>
           </div>
 
-          <div class="hud-row">
-            <div class="hud-label">High</div>
-            <div class="hud-val" style="color: #60a5fa;" id="hud-high">29139.7</div>
+          <div id="drawing-mode-banner" style="display: none; background: rgba(251, 191, 36, 0.15); border: 1px solid #fbbf24; color: #fbbf24; font-size: 0.78rem; font-weight: 600; padding: 6px 12px; border-radius: 6px; margin-bottom: 10px;"></div>
+
+          <!-- TradingView Embedded Container -->
+          <div id="tradingview_chart_container" style="width: 100%; height: 580px; border-radius: 10px; overflow: hidden; background: #070a10; position: relative;"></div>
+        </div>
+
+        <!-- TradingView Signal Box (Right Side Window) -->
+        <div class="tv-hud-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div class="hud-title" style="margin-bottom: 0;">TradingView Signal Box</div>
+            <button class="btn-scan-trade" onclick="triggerNewTradeScan()" title="Force scan live candles for a new trade setup">⚡ Scan New Trade</button>
           </div>
 
-          <div class="hud-row">
-            <div class="hud-label">Low</div>
-            <div class="hud-val" style="color: #60a5fa;" id="hud-low">28798.9</div>
+          <div class="hud-box">
+            <div class="hud-row">
+              <div class="hud-label">Signal</div>
+              <div class="hud-val">
+                <span class="badge-buy" id="hud-signal">BUY</span>
+              </div>
+            </div>
+
+            <div class="hud-row">
+              <div class="hud-label">Live Price</div>
+              <div class="hud-val" id="hud-price">28972.8</div>
+            </div>
+
+            <div class="hud-row" style="background: rgba(59, 130, 246, 0.08);">
+              <div class="hud-label" style="color: #60a5fa; font-weight: 700;">Trade Timing</div>
+              <div class="hud-val" style="color: #60a5fa; font-weight: 700;" id="hud-trade-time">18:45:00 UTC</div>
+            </div>
+
+            <div class="hud-row" style="background: rgba(16, 185, 129, 0.08);">
+              <div class="hud-label" style="color: #34d399; font-weight: 700;">Entry</div>
+              <div class="hud-val" style="color: #34d399; font-weight: 700;" id="hud-entry">28854.1</div>
+            </div>
+
+            <div class="hud-row" style="background: rgba(239, 68, 68, 0.08);">
+              <div class="hud-label" style="color: #f87171; font-weight: 700;">SL</div>
+              <div class="hud-val" style="color: #f87171; font-weight: 700;" id="hud-sl">28786.9</div>
+            </div>
+
+            <div class="hud-row" style="background: rgba(16, 185, 129, 0.08);">
+              <div class="hud-label" style="color: #4ade80; font-weight: 700;">Target 1</div>
+              <div class="hud-val" style="color: #4ade80; font-weight: 700;" id="hud-tp1">28955.0</div>
+            </div>
+
+            <div class="hud-row" style="background: rgba(16, 185, 129, 0.12);">
+              <div class="hud-label" style="color: #10b981; font-weight: 700;">Target 2</div>
+              <div class="hud-val" style="color: #10b981; font-weight: 700;" id="hud-tp2">29022.0</div>
+            </div>
+
+            <div class="hud-row">
+              <div class="hud-label">R : R</div>
+              <div class="hud-val" style="color: #fbbf24; font-weight: 700;" id="hud-rr">1 : 2</div>
+            </div>
+
+            <div class="hud-row">
+              <div class="hud-label">Bars Ago</div>
+              <div class="hud-val" id="hud-bars-ago">0</div>
+            </div>
+
+            <div class="hud-row">
+              <div class="hud-label">Why</div>
+              <div class="hud-val">
+                <span class="hud-why-tag" id="hud-why">Support Zone (VAL) + RSI Bull Div + Volume Bull Div</span>
+              </div>
+            </div>
+
+            <div class="hud-row">
+              <div class="hud-label">High</div>
+              <div class="hud-val" style="color: #60a5fa;" id="hud-high">29139.7</div>
+            </div>
+
+            <div class="hud-row">
+              <div class="hud-label">Low</div>
+              <div class="hud-val" style="color: #60a5fa;" id="hud-low">28798.9</div>
+            </div>
+          </div>
+
+          <!-- Take Trade Button -->
+          <button class="btn-take-trade" id="btn-take-trade-main" onclick="executeCurrentHUDTrade()" title="Instantly execute this trade to Journal & Active Trade Manager">⚡ TAKE TRADE NOW</button>
+
+          <!-- Trade Confirmation Checklist -->
+          <div class="confirmation-panel">
+            <div class="confirmation-header">
+              <span>Trade Confirmation</span>
+              <span class="confirmation-score-badge" id="confirmation-score">0/5 Confirmed</span>
+            </div>
+            <ul class="confirmation-list" id="confirmation-list">
+              <li class="confirmation-item pending">
+                <span class="confirmation-dot"></span>
+                <span class="confirmation-label">Awaiting live data...</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Institutional Order-Flow Meter -->
+          <div class="flow-meter-card">
+            <div class="confirmation-header">
+              <span>Institutional Order Flow</span>
+              <span class="flow-meter-tag">FII / DII Style</span>
+            </div>
+            <div class="flow-bar-track">
+              <div class="flow-bar-fill" id="flow-bar-fill" style="width: 50%;"></div>
+              <div class="flow-bar-mid"></div>
+            </div>
+            <div class="flow-meter-labels">
+              <span class="flow-label-buy">🟢 Net Buying (DII-style Accumulation)</span>
+              <span class="flow-label-sell">Net Selling (FII-style Distribution) 🔴</span>
+            </div>
+            <div class="flow-meter-value" id="flow-meter-value">Net Delta: 0</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Multi-Timeframe Signals Section -->
+      <section>
+        <div class="section-title">Multi-Timeframe Signal Radar</div>
+        <div class="tf-grid" id="tf-card-grid">
+          <!-- Rendered via app.js -->
+        </div>
+      </section>
+
+      <!-- Signal Performance Record & Win/Loss Tracker Section -->
+      <section class="screener-section" id="signal-performance-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 0.5rem;">
+          <div class="section-title" style="margin-bottom: 0;">Signal Performance Record & Win-Loss Log</div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="zoom-btn" onclick="testTrendInitAudio()" style="background: rgba(16,185,129,0.15); border-color: #10b981; color: #34d399;" title="Test Audio Alert">🔊 Test "Trend initialize"</button>
+            <button class="zoom-btn" onclick="testTargetHitAudio()" style="background: rgba(59,130,246,0.15); border-color: #3b82f6; color: #60a5fa;" title="Test Audio Alert">🔊 Test "Target Hit"</button>
+            <a href="/api/download_signals_csv" download="nasdaq_signals_ist.csv" class="fullscreen-btn" style="text-decoration: none;">📥 Export Signals CSV (IST)</a>
           </div>
         </div>
 
-        <!-- Take Trade Button -->
-        <button class="btn-take-trade" id="btn-take-trade-main" onclick="executeCurrentHUDTrade()" title="Instantly execute this trade to Journal & Active Trade Manager">⚡ TAKE TRADE NOW</button>
-
-        <!-- Trade Confirmation Checklist -->
-        <div class="confirmation-panel">
-          <div class="confirmation-header">
-            <span>Trade Confirmation</span>
-            <span class="confirmation-score-badge" id="confirmation-score">0/5 Confirmed</span>
+        <!-- Performance Metrics Summary Bar -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+          <div class="metric-card">
+            <div class="metric-label">Total Signals</div>
+            <div class="metric-val" id="metric-total-signals">14</div>
           </div>
-          <ul class="confirmation-list" id="confirmation-list">
-            <li class="confirmation-item pending">
-              <span class="confirmation-dot"></span>
-              <span class="confirmation-label">Awaiting live data...</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Institutional Order-Flow Meter (FII/DII style net buy/sell pressure) -->
-        <div class="flow-meter-card">
-          <div class="confirmation-header">
-            <span>Institutional Order Flow</span>
-            <span class="flow-meter-tag">FII / DII Style</span>
+          <div class="metric-card">
+            <div class="metric-label">Wins / Losses</div>
+            <div class="metric-val" style="color: #34d399;" id="metric-wins-losses">12 W / 2 L</div>
           </div>
-          <div class="flow-bar-track">
-            <div class="flow-bar-fill" id="flow-bar-fill" style="width: 50%;"></div>
-            <div class="flow-bar-mid"></div>
+          <div class="metric-card">
+            <div class="metric-label">Win Rate</div>
+            <div class="metric-val" style="color: #34d399;" id="metric-win-rate">85.7%</div>
           </div>
-          <div class="flow-meter-labels">
-            <span class="flow-label-buy">🟢 Net Buying (DII-style Accumulation)</span>
-            <span class="flow-label-sell">Net Selling (FII-style Distribution) 🔴</span>
+          <div class="metric-card">
+            <div class="metric-label">Total PnL</div>
+            <div class="metric-val" style="color: #34d399;" id="metric-total-pnl">+1,245.5 pts</div>
           </div>
-          <div class="flow-meter-value" id="flow-meter-value">Net Delta: 0</div>
+          <div class="metric-card">
+            <div class="metric-label">Profit Factor</div>
+            <div class="metric-val" style="color: #fbbf24;" id="metric-profit-factor">4.2</div>
+          </div>
         </div>
 
-      </div>
-    </section>
+        <!-- Signal History Table -->
+        <div class="table-responsive" style="margin-top: 0.75rem;">
+          <table class="constituents-table">
+            <thead>
+              <tr>
+                <th>Signal ID</th>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Entry Price</th>
+                <th>Stop Loss (SL)</th>
+                <th>Target (TP1 / TP2)</th>
+                <th>Status</th>
+                <th>PnL Points</th>
+              </tr>
+            </thead>
+            <tbody id="signal-history-tbody">
+              <!-- Populated via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
 
-    <!-- Multi-Timeframe Signals Section -->
-    <section>
-      <div class="section-title">Multi-Timeframe Signal Radar</div>
-      <div class="tf-grid" id="tf-card-grid">
-        <!-- Rendered via app.js -->
-      </div>
-    </section>
-
-    <!-- Signal Performance Record & Win/Loss Tracker Section -->
-    <section class="screener-section" id="signal-performance-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 0.5rem;">
-        <div class="section-title" style="margin-bottom: 0;">Signal Performance Record & Win-Loss Log</div>
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <button class="zoom-btn" onclick="testTrendInitAudio()" style="background: rgba(16,185,129,0.15); border-color: #10b981; color: #34d399;" title="Test Audio Alert">🔊 Test "Trend initialize"</button>
-          <button class="zoom-btn" onclick="testTargetHitAudio()" style="background: rgba(59,130,246,0.15); border-color: #3b82f6; color: #60a5fa;" title="Test Audio Alert">🔊 Test "Target Hit"</button>
-          <a href="/api/download_signals_csv" download="nasdaq_signals_ist.csv" class="fullscreen-btn" style="text-decoration: none;">📥 Export Signals CSV (IST)</a>
-        </div>
-      </div>
-      
-      <!-- Performance Metrics Summary Bar -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
-        <div class="metric-card">
-          <div class="metric-label">Total Signals</div>
-          <div class="metric-val" id="metric-total-signals">14</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Wins / Losses</div>
-          <div class="metric-val" style="color: #34d399;" id="metric-wins-losses">12 W / 2 L</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Win Rate</div>
-          <div class="metric-val" style="color: #34d399;" id="metric-win-rate">85.7%</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Total PnL</div>
-          <div class="metric-val" style="color: #34d399;" id="metric-total-pnl">+1,245.5 pts</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Profit Factor</div>
-          <div class="metric-val" style="color: #fbbf24;" id="metric-profit-factor">4.2</div>
-        </div>
-      </div>
-
-      <!-- Signal History Table -->
-      <div class="table-responsive" style="margin-top: 0.75rem;">
-        <table class="constituents-table">
-          <thead>
-            <tr>
-              <th>Signal ID</th>
-              <th>Time</th>
-              <th>Type</th>
-              <th>Entry Price</th>
-              <th>Stop Loss (SL)</th>
-              <th>Target (TP1 / TP2)</th>
-              <th>Status</th>
-              <th>PnL Points</th>
-            </tr>
-          </thead>
-          <tbody id="signal-history-tbody">
-            <!-- Populated via app.js -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- NASDAQ 100 Constituent Stocks Screener -->
-    <section class="screener-section">
-      <div class="screener-controls">
-        <div class="section-title" style="margin-bottom: 0;">NASDAQ-100 Constituents Scanner</div>
-        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-          <input type="text" id="table-search" class="search-box" placeholder="Search Ticker or Company...">
-          <div class="filter-btn-group">
-            <button class="filter-btn active" onclick="filterSignals('ALL', this)">ALL (100)</button>
-            <button class="filter-btn" onclick="filterSignals('BUY', this)">BUY (<span id="count-buy">8</span>)</button>
-            <button class="filter-btn" onclick="filterSignals('SELL', this)">SELL (<span id="count-sell">7</span>)</button>
-            <button class="filter-btn" onclick="filterSignals('NEUTRAL', this)">NEUTRAL (<span id="count-neutral">85</span>)</button>
+    <!-- TAB 2: F&O STOCK SCANNER SECTION -->
+    <div id="section-scanner" class="main-tab-section" style="display: none;">
+      <!-- Active Trade Manager Card -->
+      <div style="margin-bottom: 20px;">
+        <div class="active-trade-card" id="activeTradeCard">
+          <div class="at-header">
+            <div>
+              <span class="at-badge">ACTIVE TRADE</span>
+              <div class="at-stock">IG:NASDAQ</div>
+            </div>
+            <span class="at-side buy">BUY</span>
+          </div>
+          <div class="at-price-grid">
+            <div class="at-price-item"><span class="at-label">ENTRY</span><span class="at-val">28854.1</span></div>
+            <div class="at-price-item"><span class="at-label">SL</span><span class="at-val" style="color:var(--red)">28786.9</span></div>
+            <div class="at-price-item"><span class="at-label">TARGET 1</span><span class="at-val" style="color:var(--green)">28955.0</span></div>
+            <div class="at-price-item"><span class="at-label">TARGET 2</span><span class="at-val" style="color:var(--green)">29022.0</span></div>
+          </div>
+          <div class="at-pl-box">
+            <div class="at-label">FLOATING P&L</div>
+            <div class="at-pl-val" style="color:var(--green)">+118.7 pts</div>
+            <div class="at-pl-pct" style="color:var(--green)">+0.41%</div>
+          </div>
+          <div class="at-progress-wrap">
+            <div class="at-progress-bar" style="width:75%; background:var(--green)"></div>
           </div>
         </div>
       </div>
 
-      <div class="table-responsive">
-        <table class="constituents-table">
-          <thead>
-            <tr>
-              <th>Ticker / Company</th>
-              <th>Live Price</th>
-              <th>Chg %</th>
-              <th>Signal</th>
-              <th>RSI (14)</th>
-              <th>EMA20</th>
-              <th>EMA50</th>
-              <th>EMA200</th>
-            </tr>
-          </thead>
-          <tbody id="constituents-tbody">
-            <!-- Populated via app.js -->
-          </tbody>
-        </table>
+      <!-- F&O Constituents Scanner -->
+      <section class="screener-section">
+        <div class="screener-controls">
+          <div class="section-title" style="margin-bottom: 0;">NSE F&O Constituents Scanner (206 Stocks)</div>
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="table-search" class="search-box" placeholder="Search Ticker or Company...">
+            <div class="filter-btn-group">
+              <button class="filter-btn active" onclick="filterSignals('ALL', this)">ALL (100)</button>
+              <button class="filter-btn" onclick="filterSignals('BUY', this)">BUY (<span id="count-buy">8</span>)</button>
+              <button class="filter-btn" onclick="filterSignals('SELL', this)">SELL (<span id="count-sell">7</span>)</button>
+              <button class="filter-btn" onclick="filterSignals('NEUTRAL', this)">NEUTRAL (<span id="count-neutral">85</span>)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="constituents-table">
+            <thead>
+              <tr>
+                <th>Ticker / Company</th>
+                <th>Live Price</th>
+                <th>Chg %</th>
+                <th>Signal</th>
+                <th>RSI (14)</th>
+                <th>EMA20</th>
+                <th>EMA50</th>
+                <th>EMA200</th>
+              </tr>
+            </thead>
+            <tbody id="constituents-tbody">
+              <!-- Populated via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB 3: AI AGENT SECTION -->
+    <div id="section-agent" class="main-tab-section" style="display: none;">
+      <div id="agentPanel" style="display: flex;">
+        <div class="agent-panel-top">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:16px;font-weight:900;color:#fff">🤖 AI Trading Agent</span>
+              <span id="agStatusBadge" style="padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(0,230,118,.15);color:#00e676;border:1px solid rgba(0,230,118,.3)">RUNNING</span>
+              <span id="agModeBadge" style="font-size:10px;color:var(--text-dim);font-weight:600">PAPER MODE</span>
+            </div>
+            <span style="font-size:10px;color:var(--text-muted)" id="agLastUpdated">Data: TradingView Live Feed</span>
+          </div>
+
+          <!-- Controls -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+            <button id="agBtnStart" onclick="agStart()" style="padding:9px 20px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:#00e676;color:#000" disabled>▶ Start Agent</button>
+            <button id="agBtnStop"  onclick="agStop()"  style="padding:9px 20px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:#ff3d71;color:#fff">⏹ Stop</button>
+            <button id="agBtnPause" onclick="agPause()" style="padding:9px 20px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:#ffab00;color:#000">⏸ Pause</button>
+            <button id="agBtnResume" onclick="agResume()" style="padding:9px 20px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:#00d2ff;color:#000;display:none">▶ Resume</button>
+          </div>
+
+          <!-- Sub-tabs -->
+          <div style="display:flex;border-bottom:1px solid var(--border)">
+            <div class="ag-stab active" id="agstab-signals" onclick="agShowTab('signals',this)" style="padding:8px 14px;cursor:pointer;font-size:11px;font-weight:600;color:#00d2ff;border-bottom:2px solid #00d2ff">🔀 Unified Signals</div>
+            <div class="ag-stab" id="agstab-journal" onclick="agShowTab('journal',this)" style="padding:8px 14px;cursor:pointer;font-size:11px;font-weight:600;color:var(--text-dim);border-bottom:2px solid transparent">Trading Journal</div>
+          </div>
+        </div>
+
+        <div id="agsec-signals" class="agent-tab-pane" style="display:flex;flex-direction:column;overflow:hidden;margin-top:10px;">
+          <div style="flex:1;overflow-y:auto;">
+            <table style="width:100%;border-collapse:collapse;white-space:nowrap;">
+              <thead style="position:sticky;top:0;z-index:5;">
+                <tr style="background:var(--bg-card);border-bottom:1px solid var(--border);">
+                  <th style="padding:8px 12px;text-align:left;font-size:9px;text-transform:uppercase;color:var(--text-muted);">STOCK</th>
+                  <th style="padding:8px 12px;text-align:right;font-size:9px;text-transform:uppercase;color:var(--text-muted);">LTP</th>
+                  <th style="padding:8px 12px;text-align:center;font-size:9px;text-transform:uppercase;color:#00d2ff;">SIGNAL</th>
+                  <th style="padding:8px 12px;text-align:center;font-size:9px;text-transform:uppercase;color:var(--text-muted);">SCORE</th>
+                  <th style="padding:8px 12px;text-align:center;font-size:9px;text-transform:uppercase;color:#00d2ff;">STATUS</th>
+                  <th style="padding:8px 12px;text-align:right;font-size:9px;text-transform:uppercase;color:var(--text-muted);">RSI</th>
+                  <th style="padding:8px 12px;text-align:right;font-size:9px;text-transform:uppercase;color:#f87171;">SL</th>
+                  <th style="padding:8px 12px;text-align:right;font-size:9px;text-transform:uppercase;color:#22c55e;">TARGET</th>
+                  <th style="padding:8px 12px;text-align:left;font-size:9px;text-transform:uppercase;color:var(--text-muted);">SOURCES</th>
+                  <th style="padding:8px 12px;text-align:center;font-size:9px;text-transform:uppercase;color:#a855f7;">ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="usTableBody">
+                <!-- Loaded via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
+
+    <!-- TAB 4: CHART ANALYZER SECTION -->
+    <div id="section-chart" class="main-tab-section" style="display: none;">
+      <div id="chartAnalyzerPanel" style="display: flex; flex-direction: column; gap: 14px; padding: 20px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border);">
+        <div style="font-size: 14px; font-weight: 800; color: var(--cyan);">📊 CHART ANALYZER</div>
+        <div style="font-size: 12px; color: var(--text-sub);">AI Trend & Level Scanner. Upload or analyze any stock chart image directly.</div>
+      </div>
+    </div>
+
+    <!-- TAB 5: TRADING JOURNAL SECTION -->
+    <div id="section-journal" class="main-tab-section" style="display: none;">
+      <div class="journal-panel" style="padding: 20px;">
+        <div class="jp-header" style="margin-bottom: 15px;">
+          <div class="jp-title" style="font-size: 14px; font-weight: 800;">TRADING JOURNAL LOG</div>
+          <div class="jp-total-pl" id="jpTotalPL" style="font-size: 14px;">TOTAL P/L: +1,245.5 pts</div>
+        </div>
+        <div class="table-responsive">
+          <table class="constituents-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Stock</th>
+                <th>Side</th>
+                <th>Entry</th>
+                <th>Exit</th>
+                <th>P/L</th>
+                <th>%</th>
+              </tr>
+            </thead>
+            <tbody id="journalBody">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
   </div>
 
   <footer class="portal-footer">
-    <p>NASDAQ-100 Live Portal & Technical Signal Scanner | Powered by TradingView Feeds & Real-Time Analytics</p>
+    <p>NASDAQ-100 & NSE Live Portal | Powered by TradingView Feeds & Real-Time Signal Engine</p>
   </footer>
+
+  <script>
+    function switchMainTab(tabName) {
+      document.querySelectorAll('.main-tab-section').forEach(sec => sec.style.display = 'none');
+      document.querySelectorAll('#mainTabNav .ftab').forEach(btn => btn.classList.remove('active'));
+      const secEl = document.getElementById(`section-${tabName}`);
+      const btnEl = document.getElementById(`tab-btn-${tabName}`);
+      if (secEl) secEl.style.display = 'block';
+      if (btnEl) btnEl.classList.add('active');
+      if (tabName === 'agent') { loadUnifiedSignals(); }
+    }
+  </script>
 
   <script src="nse500_stocks.js"></script>
   <script src="app.js"></script>
