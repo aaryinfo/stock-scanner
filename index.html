@@ -12,6 +12,13 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <script>
+    // Instantly hide legacy boot overlay if present
+    document.addEventListener('DOMContentLoaded', function() {
+      const bo = document.getElementById('appBootOverlay');
+      if (bo) { bo.style.display = 'none'; bo.remove(); }
+    });
+  </script>
 
   <!-- Disclaimer Banner -->
   <div class="disclaimer-banner" style="background: rgba(255, 171, 0, 0.08); border-bottom: 1px solid rgba(255, 171, 0, 0.2); padding: 4px 16px; font-size: 11px; color: #ffab00; text-align: center; font-weight: 600;">
